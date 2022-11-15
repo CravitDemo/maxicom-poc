@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_pull_brokerbin" model="ir.cron">
+        <field name="name">Pull BrokerBin</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+        <field name="model_id" ref="poc_brokerbin.model_sale_brokerbin"/>
+        <field name="code">model._cron_pull_brokenbin_data()</field>
+        <field name="state">code</field>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

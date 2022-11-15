@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="brokerbin_sale_order_line_inh1" model="ir.ui.view">
+        <field name="name">brokerbin.sale.order.line.inh</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='preview_sale_order']" position="after">
+                <button name="get_sale_broker_bin_data" type="object" class="oe_stat_button" icon="fa-refresh">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">BrokerBin</span>
+                            </div>
+                        </button>
+            </xpath>
+
+            <xpath expr="//button[@name='action_draft']" position="after">
+                <button name="reload_brokerbin_data" type="object" string="Reload BrokerBin"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="after">
+                    <button name="reload_brokerbin_data" type="object" string="Reload BrokerBin"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

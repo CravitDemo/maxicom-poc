@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="rating_view_res_partner_form_inh" model="ir.ui.view">
+        <field name="name">rating.view.res.partner.form.inh</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="account.view_partner_property_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='property_supplier_payment_term_id']" position="after">
+                <field name="vendor_rating" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

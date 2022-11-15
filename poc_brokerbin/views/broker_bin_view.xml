@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_brokerbin_tree" model="ir.ui.view">
+        <field name="name">view.sale.brokerbin.tree</field>
+        <field name="model">sale.brokerbin</field>
+        <field name="arch" type="xml">
+            <tree string="BrokerBin" expand="1">
+                <field name="sale_order_id"/>
+                <field name="sale_order_line_id"/>
+                <field name="brokerbin_user"/>
+                <field name="partid"/>
+                <field name="country"/>
+                <field name="vendor"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="quantity"/>
+                <field name="state"/>
+                <field name="price"/>
+                <field name="contact_email"/>
+                <field name="contact_phone"/>
+                <field name="payment_term"/>
+                <field name="rating"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_sale_brokerbin_form" model="ir.ui.view">
+        <field name="name">view.sale.brokerbin.form</field>
+        <field name="model">sale.brokerbin</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false">
+                <sheet string="BrokerBin">
+                    <group>
+                        <group>
+                            <field name="sale_order_id"/>
+                            <field name="sale_order_line_id"/>
+                            <field name="brokerbin_user"/>
+                            <field name="partid"/>
+                            <field name="country"/>
+                            <field name="vendor"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                        </group>
+                        <group>
+                            <field name="quantity"/>
+                            <field name="state"/>
+                            <field name="price"/>
+                            <field name="description"/>
+                            <field name="contact"/>
+                            <field name="contact_email"/>
+                            <field name="contact_phone"/>
+                            <field name="payment_term"/>
+                            <field name="rating"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sale_brokerbin_filter" model="ir.ui.view">
+        <field name="name">view.sale.brokerbin.search</field>
+        <field name="model">sale.brokerbin</field>
+        <field name="arch" type="xml">
+            <search string="Brokerbin">
+                <field name="sale_order_id"/>
+                <field name="sale_order_line_id"/>
+                <field name="brokerbin_user"/>
+                <field name="partid"/>
+                <field name="country"/>
+                <field name="vendor"/>
+                <field name="email"/>
+                <field name="contact"/>
+                <group expand="0" string="Group By">
+                    <filter string="Sale Order" name="group_by_sale" domain="[]"
+                            context="{'group_by': 'sale_order_id'}"/>
+                    <filter string="PartID" name="group_by_partid" domain="[]"
+                            context="{'group_by': 'partid'}"/>
+                    <filter string="Sale Order Line" name="group_by_sale_line" domain="[]"
+                            context="{'group_by': 'sale_order_line_id'}"/>
+                    <filter string="Contact" name="group_by_contact" domain="[]" context="{'group_by': 'contact'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sale_brokerbin" model="ir.actions.act_window">
+        <field name="name">Brokerbin</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.brokerbin</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_group_by_partid': 1}</field>
+    </record>
+
+    <menuitem id="menu_action_sale_brokerbin"
+              name="Brokerbin"
+              action="action_sale_brokerbin"
+              parent="sale.sale_menu_root"
+              sequence="99"/>
+
+
+</odoo>
