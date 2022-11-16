@@ -34,10 +34,9 @@ class SaleBrokerbin(models.Model):
 
 
     def _cron_pull_brokenbin_data(self):
-        get_param = self.env['ir.config_parameter'].sudo().get_param
-        brokerbin_link = get_param('poc_brokerbin.brokerbin_link')
-        brokerbin_user = get_param('poc_brokerbin.brokerbin_user')
-        brokerbin_pw = get_param('poc_brokerbin.brokerbin_pw')
+        brokerbin_link = self.env.company.brokerbin_link
+        brokerbin_user = self.env.company.brokerbin_user
+        brokerbin_pw = self.env.company.brokerbin_pw
         client = Client(brokerbin_link, plugins=[history])
 
         print("aaaaaaa", brokerbin_link)
