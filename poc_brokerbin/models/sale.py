@@ -4,6 +4,9 @@ from zeep.plugins import HistoryPlugin
 
 history = HistoryPlugin()
 from phpserialize import unserialize, phpobject
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class SaleOrder(models.Model):
@@ -75,6 +78,7 @@ class SaleOrder(models.Model):
 			vals_dict = {}
 			for key in item:
 				vals_dict[key.decode("utf-8")] = item[key].decode("utf-8")
+				_logger.info('Data============={0}:-'.format(vals_dict.get('part')))
 			self.data_process_order_line(vals_dict, self.order_line)
 			print("\n\n\n")
 		return True

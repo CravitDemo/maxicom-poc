@@ -1,9 +1,11 @@
 from odoo import models, fields
 from zeep import Client, Settings, helpers
-import json
 from zeep.plugins import HistoryPlugin
 history = HistoryPlugin()
 from phpserialize import unserialize, phpobject
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class SaleBrokerbin(models.Model):
@@ -64,6 +66,7 @@ class SaleBrokerbin(models.Model):
             vals_dict = {}
             for key in item:
                 vals_dict[key.decode("utf-8")] = item[key].decode("utf-8")
+                _logger.info('Data============={0}:-'.format(vals_dict.get('part')))
             print("vals_dict...........",vals_dict)
             broken_bin_data = {
                 'vendor': vals_dict.get('company'),
