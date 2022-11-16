@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@id='sale_ebay']" position="after">
-                <h2>POC BrokerBin</h2>
+                <h2>BrokerBin</h2>
                 <div class="row mt16 o_settings_container"
                      id="pain">
                     <div class="col-xs-12 col-md-6 o_setting_box">

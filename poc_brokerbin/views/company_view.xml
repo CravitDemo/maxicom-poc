@@ -8,7 +8,7 @@
             <field name="inherit_id" ref="base.view_company_form" />
             <field name="arch" type="xml">
                 <xpath expr="//notebook/page" position="after">
-                    <page name="brokerbin" string="POC BrokerBin">
+                    <page name="brokerbin" string="BrokerBin">
                            <group>
                                <group>
                                    <field name="brokerbin_link"/>
