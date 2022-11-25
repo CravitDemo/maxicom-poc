@@ -27,14 +27,12 @@ class SaleOrder(models.Model):
 		}
 		return action
 
-	def brokerbin_connect(self):
+	def brokerbin_connect(self, partId):
 		brokerbin_link = self.env.company.brokerbin_link
 		brokerbin_user = self.env.company.brokerbin_user
 		brokerbin_pw = self.env.company.brokerbin_pw
 		client = Client(brokerbin_link, plugins=[history])
-
 		authToken = client.service.Authenticate(reqUsername=brokerbin_user, reqPassword=brokerbin_pw, reqOptions=[])
-		partId = 'PA-FE-TX'
 		searchOptions = dict()
 		searchOptions["max_resultset"] = 250
 		searchOptions["search_type"] = 'partkey'
@@ -42,10 +40,15 @@ class SaleOrder(models.Model):
 		searchOptions["sort_order"] = 'ASC'
 		searchOptions["contact"] = True
 		searchOptions["uid"] = authToken
-		xmlSearchOptions = helpers.create_xml_soap_map(searchOptions)
-		result = client.service.Search(reqPart=partId, reqOptions=xmlSearchOptions)
-		unserializedResult = unserialize(bytes(result, 'utf-8'), object_hook=phpobject)
-		results = unserializedResult[b'resultset'][0][b'result']
+		partId = partId
+		results = False
+		try:
+			xmlSearchOptions = helpers.create_xml_soap_map(searchOptions)
+			result = client.service.Search(reqPart=partId, reqOptions=xmlSearchOptions)
+			unserializedResult = unserialize(bytes(result, 'utf-8'), object_hook=phpobject)
+			results = unserializedResult[b'resultset'][0][b'result']
+		except Exception as e:
+			_logger.info('e============={0}:-'.format(e))
 		return results
 
 	def data_process_order_line(self, vals_dict, order_line):
@@ -66,28 +69,42 @@ class SaleOrder(models.Model):
 				}
 				self.env['sale.brokerbin'].create(broken_bin_data)
 
-	def reload_brokerbin_data(self):
+	def btn_sale_reload_brokerbin_data(self):
+		brokerbin_ids = self.env['sale.brokerbin'].search([('sale_order_id', '=', self.id)])
+		if brokerbin_ids:
+			brokerbin_ids.unlink()
+		brokerbin_link = self.env.company.brokerbin_link
+		brokerbin_user = self.env.company.brokerbin_user
+		brokerbin_pw = self.env.company.brokerbin_pw
+		client = Client(brokerbin_link, plugins=[history])
+		authToken = client.service.Authenticate(reqUsername=brokerbin_user, reqPassword=brokerbin_pw, reqOptions=[])
+		searchOptions = dict()
+		searchOptions["max_resultset"] = 250
+		searchOptions["search_type"] = 'partkey'
+		searchOptions["sort_by"] = 'price'
+		searchOptions["sort_order"] = 'ASC'
+		searchOptions["contact"] = True
+		searchOptions["uid"] = authToken
 		for line in self.order_line:
-			brokerbin_ids = self.env['sale.brokerbin'].search([('sale_order_id', '=', self.id),
-															   ('sale_order_line_id', '=', line.id)])
-			if brokerbin_ids:
-				brokerbin_ids.unlink()
-		results = self.brokerbin_connect()
-		for index in results:
-			item = results[index]
-			vals_dict = {}
-			for key in item:
-				vals_dict[key.decode("utf-8")] = item[key].decode("utf-8")
-				_logger.info('Data============={0}:-'.format(vals_dict.get('part')))
-			self.data_process_order_line(vals_dict, self.order_line)
-			print("\n\n\n")
+			partId = line.product_id.default_code
+			xmlSearchOptions = helpers.create_xml_soap_map(searchOptions)
+			result = client.service.Search(reqPart=partId, reqOptions=xmlSearchOptions)
+			unserializedResult = unserialize(bytes(result, 'utf-8'), object_hook=phpobject)
+			results = unserializedResult[b'resultset'][0][b'result']
+			for index in results:
+				item = results[index]
+				vals_dict = {}
+				for key in item:
+					vals_dict[key.decode("utf-8")] = item[key].decode("utf-8")
+				self.data_process_order_line(vals_dict, self.order_line)
+
 		return True
 
 
 class SaleOrderLine(models.Model):
 	_inherit = 'sale.order.line'
 
-	def reload_brokerbin_data(self):
+	def order_line_reload_brokerbin_data(self):
 		action = {
 			'name': _('BrokenBin'),
 			'view_mode': 'tree',
@@ -106,24 +123,33 @@ class SaleOrderLine(models.Model):
 															   ('sale_order_line_id', '=', self.id)])
 			if brokerbin_ids:
 				brokerbin_ids.unlink()
-			results = self.order_id.brokerbin_connect()
-			for index in results:
-				item = results[index]
-				vals_dict = {}
-				for key in item:
-					vals_dict[key.decode("utf-8")] = item[key].decode("utf-8")
-				self.order_id.data_process_order_line(vals_dict, self)
+			results = self.order_id.brokerbin_connect(self.product_id.default_code)
+			if results:
+				for index in results:
+					item = results[index]
+					vals_dict = {}
+					for key in item:
+						vals_dict[key.decode("utf-8")] = item[key].decode("utf-8")
+					self.order_id.data_process_order_line(vals_dict, self)
 		return res
 
 	@api.model
 	def create(self, vals):
 		res = super(SaleOrderLine, self).create(vals)
-		results = res.order_id.brokerbin_connect()
-		for index in results:
-			item = results[index]
-			vals_dict = {}
-			for key in item:
-				vals_dict[key.decode("utf-8")] = item[key].decode("utf-8")
-			res.order_id.data_process_order_line(vals_dict, res)
+		results = res.order_id.brokerbin_connect(res.product_id.default_code)
+		if results:
+			for index in results:
+				item = results[index]
+				vals_dict = {}
+				for key in item:
+					vals_dict[key.decode("utf-8")] = item[key].decode("utf-8")
+				res.order_id.data_process_order_line(vals_dict, res)
+		return res
 
+	def unlink(self):
+		brokerbin_ids = self.env['sale.brokerbin'].search([('sale_order_id', '=', self.order_id.id),
+														   ('sale_order_line_id', '=', self.id)])
+		if brokerbin_ids:
+			brokerbin_ids.unlink()
+		res = super(SaleOrderLine, self).unlink()
 		return res

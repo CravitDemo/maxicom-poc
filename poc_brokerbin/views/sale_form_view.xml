@@ -14,10 +14,10 @@
             </xpath>
 
             <xpath expr="//button[@name='action_draft']" position="after">
-                <button name="reload_brokerbin_data" type="object" string="Reload BrokerBin"/>
+                <button name="btn_sale_reload_brokerbin_data" type="object" string="Reload BrokerBin"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="after">
-                    <button name="reload_brokerbin_data" type="object" string="BrokerBin"/>
+                    <button name="order_line_reload_brokerbin_data" type="object" string="BrokerBin"/>
             </xpath>
         </field>
     </record>
